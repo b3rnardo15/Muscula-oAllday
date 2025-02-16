@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Desempenho</title>
+    <link rel="stylesheet" href="styles.css"> <!-- Link para o arquivo CSS -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <header>
+        <h1 id="tituloApp">Desempenho de Treino</h1>
+    </header>
+
+    <div class="container">
+        <section class="intro">
+            <h2>Será que já é Gyarados ou ainda tá na fase Magikarp?</h2>
+            <div id="graficoDesempenho">
+                <canvas id="graficoExercicios"></canvas>
+            </div>
+        </section>
+
+        <div class="actions">
+            <button id="btnVoltar" onclick="window.location.href='index.html'">Voltar para a Página Inicial</button>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2025 App de Treinos - Todos os direitos reservados b3rnardo_15.</p>
+    </footer>
+
+    <script>
+        // Função para renderizar o gráfico de desempenho
+        function renderizarGrafico() {
+            const exercicios = JSON.parse(localStorage.getItem('exercicios')) || [];
+
+            const labels = [];  // Categorias dos exercícios
+            const dataSeries = [];  // Total de séries por categoria
+            const dataCarga = [];  // Carga total por categoria
+            const dataRepeticoes = [];  // Total de repetições por categoria
+
+            exercicios.forEach(exercicio => {
+                if (!labels.includes(exercicio.categoria)) {
+                    labels.push(exercicio.categoria);
+                    dataSeries.push(0);
+                    dataCarga.push(0);
+                    dataRepeticoes.push(0);
+                }
+
+                const index = labels.indexOf(exercicio.categoria);
+                dataSeries[index] += parseInt(exercicio.series);
+                dataCarga[index] += parseInt(exercicio.carga);
+                dataRepeticoes[index] += parseInt(exercicio.repeticoes);
+            });
+
+            // Configuração do gráfico
+            const ctx = document.getElementById('graficoExercicios').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',  // Tipo de gráfico
+                data: {
+                    labels: labels,  // Usando as categorias como rótulos
+                    datasets: [
+                        {
+                            label: 'Total de Séries',
+                            data: dataSeries,
+                            backgroundColor: 'rgba(40, 167, 69, 0.5)',
+                            borderColor: 'rgba(40, 167, 69, 1)',
+                            borderWidth: 1
+                        },
+                        {
+                            label: 'Carga Total (kg)',
+                            data: dataCarga,
+                            backgroundColor: 'rgba(54, 162, 235, 0.5)',
+                            borderColor: 'rgba(54, 162, 235, 1)',
+                            borderWidth: 1
+                        },
+                        {
+                            label: 'Total de Repetições',
+                            data: dataRepeticoes,
+                            backgroundColor: 'rgba(255, 206, 86, 0.5)',
+                            borderColor: 'rgba(255, 206, 86, 1)',
+                            borderWidth: 1
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: { beginAtZero: true }
+                    },
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Desempenho por Categoria'
+                        }
+                    }
+                }
+            });
+        }
+
+        // Carregar o gráfico ao abrir a página
+        window.addEventListener('load', () => {
+            if (window.location.pathname.includes('desempenho.html')) {
+                renderizarGrafico();
+            }
+        });
+    </script>
+</body>
+</html>
